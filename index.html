@@ -1,95 +1,164 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-bs-theme="dark">
-
 <head>
-	<meta charset="utf-8">
-	<title>Amman Stream Player</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <title>Amman Stream Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    html, body { height: 100%; }
+    .vh-100 { min-height: 100vh; }
+    .ratio-16x9 { background: #000; }
+  </style>
 </head>
 
 <body class="bg-black text-light d-flex flex-column align-items-center justify-content-center vh-100">
+  <div class="container text-center">
+    <h2 class="mb-4">🎬 <span style="color:#6351ff;">Amman</span> Stream Player</h2>
 
-	<div class="container text-center">
-		<h2 class="mb-4">🎬 <span style="color: #6351ff;">Amman</span>  Stream Player</h2>
+    <!-- Inputs -->
+    <div class="row justify-content-center g-3">
+      <div class="col-12 col-md-6">
+        <label for="videoUid" class="form-label">Video UID</label>
+        <input
+          id="videoUid"
+          type="text"
+          class="form-control text-center"
+          placeholder="Enter Video UUID (e.g., 6fc1e036-114a-4fb2-a6dd-f68150af497e)"
+        />
+      </div>
+      <div class="col-12 col-md-6">
+        <label for="apiKey" class="form-label">API Key</label>
+        <input
+          id="apiKey"
+          type="text"
+          class="form-control text-center"
+          value="easytech_85b719d6-775a-40f9-b236-3a9b02398af1"
+        />
+      </div>
+    </div>
 
-		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
-			<label for="videoUid" class="form-label">Video UID</label>
-			<input type="text" id="videoUid" class="form-control text-center"
-				placeholder="Enter Video UUID (e.g., 6fc1e036-114a-4fb2-a6dd-f68150af497e)">
-		</div>
+    <button id="generateBtn" class="btn btn-primary px-4 mt-3">Generate OTP &amp; Play</button>
+    <div id="status" class="mt-3 text-info"></div>
 
-		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
-			<label for="apiKey" class="form-label">API Key</label>
-			<input type="text" id="apiKey" class="form-control text-center"
-				value="easytech_85b719d6-775a-40f9-b236-3a9b02398af1">
-		</div>
+    <!-- Player -->
+    <div class="py-5 d-flex justify-content-center align-items-center w-100">
+      <div class="ratio ratio-16x9" style="max-width: 720px; width: 100%;">
+        <iframe
+          id="videoFrame"
+          allow="autoplay; fullscreen; encrypted-media"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          style="border:none; display:none;"
+          title="Amman DRM Player"
+        ></iframe>
+      </div>
+    </div>
+  </div>
 
-		<button id="generateBtn" class="btn btn-primary px-4 mt-2">Generate OTP & Play</button>
+  <script>
+    // --- Constants ---
+    const AMMAN_BACKEND_ORIGIN = "https://test.easy-stream.net"; // iframe origin
+    const OTP_ENDPOINT_BASE = `${AMMAN_BACKEND_ORIGIN}/api/video/generate-otp`; // POST /:uid/
+    const PLAYER_PAGE_URL = `${AMMAN_BACKEND_ORIGIN}/api/video/player/`;       // ?otp=&playbackInfo=
+    const STATIC_WID = "01030265229"; // viewer id (unchanged)
 
-		<div id="status" class="mt-3 text-info"></div>
+    // --- DOM ---
+    const $uid = document.getElementById("videoUid");
+    const $key = document.getElementById("apiKey");
+    const $btn = document.getElementById("generateBtn");
+    const $status = document.getElementById("status");
+    const $iframe = document.getElementById("videoFrame");
 
-		<div class="py-5 d-flex justify-content-center align-items-center w-100">
-			<div class="ratio ratio-16x9" style="max-width: 720px; width: 100%;">
-				<iframe id="videoFrame" allow="autoplay; fullscreen; encrypted-media"
-					sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-					style="border:none; display:none;">
-				</iframe>
-			</div>
-		</div>
-	</div>
+    // --- Helpers ---
+    const setStatus = (msg, cls = "text-info") => {
+      $status.className = `mt-3 ${cls}`;
+      $status.textContent = msg;
+    };
 
-	<script>
-		const wid = "01030265229"; // viewer ID (static)
+    async function generateOtp(uid, apiKey) {
+      const url = `${OTP_ENDPOINT_BASE}/${encodeURIComponent(uid)}/`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `api-key ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ wid: STATIC_WID })
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      return res.json(); // { otp, playbackInfo }
+    }
 
-		document.getElementById("generateBtn").addEventListener("click", async () => {
-			const videoUid = document.getElementById("videoUid").value.trim();
-			const apiKey = document.getElementById("apiKey").value.trim();
-			const status = document.getElementById("status");
-			const iframe = document.getElementById("videoFrame");
+    function buildPlayerSrc(otp, playbackInfo) {
+      const params = new URLSearchParams({
+        otp: otp,
+        playbackInfo: playbackInfo
+      });
+      return `${PLAYER_PAGE_URL}?${params.toString()}`;
+    }
 
-			if (!videoUid) {
-				status.textContent = "⚠️ Please enter a video UID.";
-				return;
-			}
-			if (!apiKey) {
-				status.textContent = "⚠️ Please enter an API key.";
-				return;
-			}
+    // --- Main action ---
+    $btn.addEventListener("click", async () => {
+      const uid = ($uid.value || "").trim();
+      const apiKey = ($key.value || "").trim();
 
-			status.textContent = "⏳ Generating OTP...";
-			iframe.style.display = "none";
+      if (!uid) return setStatus("⚠️ Please enter a video UID.", "text-warning");
+      if (!apiKey) return setStatus("⚠️ Please enter an API key.", "text-warning");
 
-			try {
-				const response = await fetch(`https://test.easy-stream.net/api/video/generate-otp/${videoUid}/`, {
-					method: "POST",
-					headers: {
-						"Authorization": `api-key ${apiKey}`,
-						"Content-Type": "application/json"
-					},
-					body: JSON.stringify({
-						wid
-					})
-				});
+      setStatus("⏳ Generating OTP...");
+      $iframe.style.display = "none";
+      $iframe.removeAttribute("src"); // reset previous player
 
-				if (!response.ok) {
-					throw new Error(`Server returned ${response.status}`);
-				}
+      try {
+        const { otp, playbackInfo } = await generateOtp(uid, apiKey);
+        const src = buildPlayerSrc(otp, playbackInfo);
+        $iframe.src = src;
+        $iframe.style.display = "block";
+        setStatus("✅ Video loaded successfully!", "text-success");
+      } catch (err) {
+        console.error(err);
+        setStatus(`❌ Error: ${err.message}`, "text-danger");
+      }
+    });
 
-				const data = await response.json();
-				const otp = data.otp;
-				const playbackInfo = data.playbackInfo;
+    // --- Console logger for ALL Amaan events (no logic changes) ---
+    function logEvt(name, data) {
+      const ts = new Date().toISOString();
+      console.log(`[AMAAN EVT] ${ts} :: ${name}`, data ?? "");
+    }
 
-				iframe.src =
-					`https://test.easy-stream.net/api/video/player/?otp=${encodeURIComponent(otp)}&playbackInfo=${encodeURIComponent(playbackInfo)}`;
-				iframe.style.display = "block";
-				status.textContent = "✅ Video loaded successfully!";
-			} catch (error) {
-				console.error(error);
-				status.textContent = `❌ Error: ${error.message}`;
-			}
-		});
-	</script>
+    window.addEventListener("message", (e) => {
+      // Only accept messages from the backend iframe
+      if (e.origin !== AMMAN_BACKEND_ORIGIN) return;
+
+      const { type, payload } = e.data || {};
+      if (!type || !type.startsWith("amaan:")) return;
+
+      switch (type) {
+        case "amaan:ready":
+          console.log("[AMAAN READY]", payload?.state);
+          break;
+
+        case "amaan:evt": {
+          const { evt, data } = payload || {};
+          // This prints: play, pause, time, duration, seeking, volume, mute, unmute,
+          // quality, subtitle, speed, buffering, buffered, fullscreen, error, ended, etc.
+          logEvt(evt, data);
+          break;
+        }
+
+        case "amaan:resp":
+          // Only relevant if you later send commands from parent to child
+          console.log("[AMAAN RESP]", payload);
+          break;
+
+        default:
+          console.log("[AMAAN UNKNOWN]", e.data);
+      }
+    });
+  </script>
 </body>
-
 </html>
