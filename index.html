@@ -81,7 +81,7 @@
 				const playbackInfo = data.playbackInfo;
 
 				iframe.src =
-					`https://test.easy-stream.net/api/video/player/?otp=${encodeURIComponent(otp)}&playbackInfo=${encodeURIComponent(playbackInfo)}`;
+					`https://test.easy-stream.net/player/video/?otp=${encodeURIComponent(otp)}&playbackInfo=${encodeURIComponent(playbackInfo)}`;
 				iframe.style.display = "block";
 				status.textContent = "✅ Video loaded successfully!";
 			} catch (error) {
