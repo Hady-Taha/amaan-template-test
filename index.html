@@ -5,10 +5,11 @@
 	<meta charset="utf-8">
 	<title>Amman Stream Player v2</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="./img/logo.png">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-black text-light d-flex flex-column align-items-center justify-content-center vh-100">
+<body class="bg-black text-light d-flex flex-column align-items-center justify-content-center py-5">
 
 	<div class="container text-center">
 		<h2 class="mb-4">🎬 <span style="color: #6351ff;">Amman</span>  Stream Player</h2>
@@ -16,7 +17,7 @@
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
 			<label for="videoUid" class="form-label">Video UID</label>
 			<input type="text" id="videoUid" class="form-control text-center"
-				placeholder="Enter Video UUID" value="cee98231-10cf-46e0-a957-bc71c444ebda">
+				placeholder="Enter Video UUID" value="23ceca6a-a702-4d87-a362-4d5deb46e401">
 		</div>
 
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
@@ -40,8 +41,8 @@
 	</div>
 
 	<script>
-		const wid = "01030265229"; // viewer ID (static)
-
+		const wid = "01030265229"; // viewer ID (static) // https://test.easy-stream.net
+		const base_url = 'http://127.0.0.1:8000'
 		document.getElementById("generateBtn").addEventListener("click", async () => {
 			const videoUid = document.getElementById("videoUid").value.trim();
 			const apiKey = document.getElementById("apiKey").value.trim();
@@ -61,7 +62,7 @@
 			iframe.style.display = "none";
 
 			try {
-				const response = await fetch(`https://test.easy-stream.net/api/video/generate-otp/${videoUid}/`, {
+				const response = await fetch(`${base_url}/api/video/generate-otp/${videoUid}/`, {
 					method: "POST",
 					headers: {
 						"Authorization": `api-key ${apiKey}`,
@@ -81,7 +82,7 @@
 				const playbackInfo = data.playbackInfo;
 
 				iframe.src =
-					`https://test.easy-stream.net/player/video/?otp=${encodeURIComponent(otp)}&playbackInfo=${encodeURIComponent(playbackInfo)}`;
+					`${base_url}/player/video/?otp=${encodeURIComponent(otp)}&playbackInfo=${encodeURIComponent(playbackInfo)}`;
 				iframe.style.display = "block";
 				status.textContent = "✅ Video loaded successfully!";
 			} catch (error) {
