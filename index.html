@@ -18,7 +18,7 @@
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
 			<label for="videoUid" class="form-label">Video UID</label>
 			<input type="text" id="videoUid" class="form-control text-center" placeholder="Enter Video UUID"
-				value="f41b809b-8337-4cfe-acf6-f830dda958f4">
+				value="a1f0c718-8660-478c-ac6e-733aaccc7837">
 		</div>
 
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
@@ -97,15 +97,22 @@
 		const iframe = document.querySelector('iframe');
 		const player = AmaanPlayer.getInstance(iframe);
 		// All DOM API supports on player.video
-		player.addEventListener("metadata", () => {
-			player.getDuration().then((duration) => {
-				console.log("Duration:", duration);
-			});
+		// player.addEventListener("metadata", () => {
+		// 	player.getDuration().then((duration) => {
+		// 		console.log("Duration:", duration);
+		// 	});
+		// });
+
+		player.addEventListener("metadata", (e) => {
+			console.log("Buffered ranges:");
+		})
+		player.addEventListener("progress", (data) => {
+			console.log("Video duration:", data);
 		});
 
-		player.addEventListener("time", (data) => {
-			console.log("Current time:", data.time);
-		});
+		// player.addEventListener("time", (data) => {
+		// 	console.log("Current time:", data.time);
+		// });
 		// Example quartile listener
 	</script>
 </body>

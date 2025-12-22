@@ -31,6 +31,8 @@ class AmaanPlayer {
     /* ============== EVENTS ================== */
     addEventListener(eventName, callback) {
         const handler = (msg) => {
+            console.log(msg.data);
+            
             if (!msg.data) return;
 
             if (msg.data.event === "fragment") return;
