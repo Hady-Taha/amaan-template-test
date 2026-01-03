@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-bs-theme="light">
+
+<head>
+    <!--Bootstrap v5.3.3-->
+    <title>New Project</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="img/logo.png">
+    <link rel="stylesheet" href="css/lib/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/lib/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="https://cdn.plrjs.com/player/fz3579nin837k/nv0s9ufktjqj.js"></script>
+    <script src="js/lib/bootstrap.bundle.min.js"></script>
+    <style>
+        #player {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-black">
+
+    <div id="player"></div>
+
+
+
+    <script>
+        let player = new Playerjs({
+            id: "player",
+            file: 'https://stream.amaan-stream.com/uploads/abozaid/eca38b6a-3dbc-439a-aa4a-30f288678054/49dc30bc-20b6-4bb6-b9c0-3f56391eb706/streaming/manifest.mpd',
+        });
+
+
+        let totalBytes = 0;
+
+        (function () {
+            const origOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function (method, url) {
+                this._url = url;
+                return origOpen.apply(this, arguments);
+            };
+
+            const origSend = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.send = function () {
+                this.addEventListener("loadend", function () {
+                    if (this._url && this._url.includes(".m4s")) {
+                        const size =
+                            this.getResponseHeader("Content-Length") ||
+                            (this.response && this.response.byteLength) ||
+                            0;
+
+                        totalBytes += Number(size);
+
+                        console.log(
+                            "📊 استهلاك فعلي:",
+                            (totalBytes / (1024 * 1024)).toFixed(2),
+                            "MB"
+                        );
+                    }
+                });
+                return origSend.apply(this, arguments);
+            };
+        })();
+    </script>
+
+
+
+
+</body>
+
+</html>
