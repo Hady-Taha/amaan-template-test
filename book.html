@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <title>Amman Stream Player v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="./img/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-black text-light d-flex flex-column align-items-center justify-content-center py-5" style="height: 100dvh;">
+
+    <!-- Button -->
+    <button id="generateBtn" class="btn btn-lg btn-light rounded-4 fw-bold fs-1">
+        Generate Book Link
+    </button>
+
+    <!-- Link (hidden first) -->
+    <a id="bookLink"
+       href="#"
+       target="_blank"
+       class="btn btn-lg btn-success rounded-4 fw-bold fs-1 mt-3 d-none">
+        Open Book
+    </a>
+
+    <small class="mt-3 text-secondary">Hx</small>
+
+<script>
+    const generateBtn = document.getElementById("generateBtn");
+    const bookLink = document.getElementById("bookLink");
+
+    generateBtn.addEventListener("click", () => {
+        generateBtn.disabled = true;
+        generateBtn.innerText = "Generating...";
+
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "api-key 06bac63d-bdce-4d18-b410-63f96bcbef9e");
+
+        fetch(
+            "https://amaan-test.easy-stream.net/api/book/generate-url/06bac63dbdce4d18b41063f96bcbef9e/",
+            {
+                method: "POST",
+                headers: myHeaders,
+            }
+        )
+        .then(response => response.json())
+        .then(data => {
+            // add url to <a href="">
+            bookLink.href = data.url;
+
+            // show link button
+            bookLink.classList.remove("d-none");
+
+            // hide generate button
+            generateBtn.classList.add("d-none");
+        })
+        .catch(error => {
+            console.error(error);
+            generateBtn.disabled = false;
+            generateBtn.innerText = "Generate Book Link";
+        });
+    });
+</script>
+
+</body>
+</html>
