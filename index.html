@@ -18,13 +18,13 @@
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
 			<label for="videoUid" class="form-label">Video UID</label>
 			<input type="text" id="videoUid" class="form-control text-center" placeholder="Enter Video UUID"
-				value="a8c6a1a2-84eb-49b8-ab13-8d33d9d95c0a">
+				value="9e2163c1-3824-4078-acbe-56a9e73d1dcf">
 		</div>
 
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
 			<label for="apiKey" class="form-label">API Key</label>
 			<input type="text" id="apiKey" class="form-control text-center"
-				value="amaan-root_dcd2f6e02a0d46aaa89e6232a297d661">
+				value="06bac63d-bdce-4d18-b410-63f96bcbef9e">
 		</div>
 
 		<button id="generateBtn" class="btn btn-primary px-4 mt-2">Generate OTP & Play</button>
@@ -43,7 +43,7 @@
 
 	<script>
 		const wid = "01030265229"; // viewer ID (static) // https://test.easy-stream.net
-		const base_url = 'https://api2.amaan-stream.com'
+		const base_url = 'https://amaan-test.easy-stream.net'
 		document.getElementById("generateBtn").addEventListener("click", async () => {
 			const videoUid = document.getElementById("videoUid").value.trim();
 			const apiKey = document.getElementById("apiKey").value.trim();
