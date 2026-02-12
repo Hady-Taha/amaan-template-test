@@ -23,7 +23,8 @@
 
 		<div class="mb-3 w-100" style="max-width: 500px; margin:auto;">
 			<label for="apiKey" class="form-label">API Key</label>
-			<input type="text" id="apiKey" class="form-control text-center" value="customerapikey">
+			<input type="text" id="apiKey" class="form-control text-center"
+				value="customerapikey">
 		</div>
 
 		<button id="generateBtn" class="btn btn-primary px-4 mt-2">Generate OTP & Play</button>
@@ -42,7 +43,13 @@
 
 	<script>
 		const wid = "01030265229"; // viewer ID (static) // https://test.easy-stream.net
-
+		const customer_data = [
+			{
+				"lesson_id":1,
+				"auth_token":"the_auth"
+			}
+		
+		]
 		const base_url = 'https://api.amaaan.net'
 		document.getElementById("generateBtn").addEventListener("click", async () => {
 			const videoUid = document.getElementById("videoUid").value.trim();
@@ -71,10 +78,7 @@
 					},
 					body: JSON.stringify({
 						wid,
-						"customer_data": [{
-							"key": "customer_id",
-							"value": "1234567890"
-						}]
+						customer_data,
 					})
 				});
 
@@ -122,3 +126,5 @@
 </body>
 
 </html>
+
+
